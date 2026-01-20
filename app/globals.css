@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #222222;
+  --foreground: #f0f0f0;
+  --primary: #00ff00;
+  --secondary: #00ccff;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  /* 确保字体回退 */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 覆盖默认的 focus ring 颜色为终端绿 */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 简单的复古滚动条 */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-left: 1px solid #333;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border: 1px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 选中文本样式 */
+::selection {
+  background: var(--primary);
+  color: #000;
+}
