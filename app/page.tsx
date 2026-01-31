@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useChat } from "ai/react";
+import ReactMarkdown from 'react-markdown';
 import {
   Send,
   Settings,
@@ -362,8 +363,28 @@ export default function Home() {
                              ? "border-secondary text-foreground bg-secondary/5" 
                              : "border-primary text-foreground bg-primary/5"
                         }`}>
-                           <div className="whitespace-pre-wrap leading-relaxed">
-                              {m.content}
+                           <div className="leading-relaxed">
+                              {m.role === 'user' ? (
+                                 <div className="whitespace-pre-wrap">{m.content}</div>
+                              ) : (
+                                 <ReactMarkdown
+                                    components={{
+                                       strong: ({node, ...props}) => <span className="font-bold text-secondary" {...props} />,
+                                       p: ({node, ...props}) => <p className="mb-2 leading-relaxed" {...props} />,
+                                       ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
+                                       ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
+                                       li: ({node, ...props}) => <li className="ml-2" {...props} />,
+                                       h1: ({node, ...props}) => <h1 className="text-xl font-bold text-primary mt-4 mb-2" {...props} />,
+                                       h2: ({node, ...props}) => <h2 className="text-lg font-bold text-primary mt-4 mb-2" {...props} />,
+                                       h3: ({node, ...props}) => <h3 className="font-bold text-primary mt-3 mb-1" {...props} />,
+                                       blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-primary pl-4 italic text-muted my-2" {...props} />,
+                                       code: ({node, ...props}) => <code className="bg-black/30 px-1 py-0.5 rounded text-secondary font-mono text-sm" {...props} />,
+                                       pre: ({node, ...props}) => <pre className="bg-black/50 p-3 rounded border border-primary/30 overflow-x-auto mb-4 text-xs" {...props} />,
+                                    }}
+                                 >
+                                    {m.content}
+                                 </ReactMarkdown>
+                              )}
                            </div>
                         </div>
                      </div>
