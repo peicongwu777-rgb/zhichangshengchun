@@ -99,7 +99,7 @@ export default function Home() {
 
   const [customJob, setCustomJob] = useState("");
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, setMessages, append } = useChat({
     api: "/api/chat",
     body: {
       ...config,
@@ -109,7 +109,24 @@ export default function Home() {
       Authorization: apiKey ? `Bearer ${apiKey}` : "",
       "x-model-id": modelId || "",
     },
+    initialMessages: [],
   });
+
+  // 自动开始游戏逻辑
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (stage === 'playing' && !hasInitialized.current) {
+      hasInitialized.current = true;
+      // 延迟一点以确保状态稳定
+      setTimeout(() => {
+        append({
+          role: 'user',
+          content: "【系统指令】初始化模拟器。请进行开场介绍，并询问我的核心游戏目标（是搞钱、拿身份还是爬职场）。不要直接进入大四选择，先让我确立目标。"
+        });
+      }, 100);
+    }
+  }, [stage, append]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -133,13 +150,34 @@ export default function Home() {
               <span className="w-2 h-2 bg-primary animate-pulse"></span>
               SYSTEM_READY
            </div>
-           <h1 className="text-4xl font-bold mb-4 tracking-tighter">
-             职场求生_2026.exe
+           <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter">
+             职场求生 <span className="text-primary">2026</span>
            </h1>
-           <p className="text-muted">
-             {">"} 初始化... <br/>
-             {">"} 请选择你的初始配置以开始模拟。
+           <p className="text-muted text-sm md:text-base mb-4 max-w-2xl">
+             {">"} 这是一个基于真实数据的残酷模拟。请选择你的开局配置，在这个只有 0 和 1 的世界里活下去。
            </p>
+           
+           <details className="text-xs text-muted">
+              <summary className="cursor-pointer hover:text-primary underline list-none">[查看胜利条件 & 游戏目标]</summary>
+              <div className="mt-4 p-4 border border-primary/50 bg-black/50 text-left text-sm text-zinc-300">
+                <h3 className="text-primary font-bold mb-2 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" /> 游戏目标 (MISSION_OBJECTIVES)
+                </h3>
+                <ul className="list-disc list-inside space-y-1 text-xs md:text-sm">
+                  <li><strong className="text-white">时间跨度：</strong> 2026年9月 (大四) - 2032年 (共6年)</li>
+                  <li><strong className="text-white">胜利条件 (达成其一)：</strong></li>
+                  <li className="pl-4 text-zinc-400">- 财富自由：存款 {'>'} $1,000,000</li>
+                  <li className="pl-4 text-zinc-400">- 身份上岸：获得目标区域永久居留权 (绿卡/户口)</li>
+                  <li className="pl-4 text-zinc-400">- 职场巅峰：晋升 Senior/Manager (智力{'>'}70, Networking{'>'}80)</li>
+                  <li><strong className="text-white">求职机构 (Agency)：</strong></li>
+                  <li className="pl-4 text-zinc-400">- 提供正规内推、导师辅导、挂靠实习服务</li>
+                  <li className="pl-4 text-zinc-400">- 挂靠实习可<strong className="text-secondary">暂停OPT失业期倒计时</strong></li>
+                  <li><strong className="text-white">失败条件：</strong></li>
+                  <li className="pl-4 text-zinc-400">- 存款或San值归零</li>
+                  <li className="pl-4 text-zinc-400">- 签证失效/非法滞留 (美国区 OPT 失业期耗尽)</li>
+                </ul>
+              </div>
+           </details>
         </header>
 
         {/* 区域选择 */}
@@ -314,7 +352,7 @@ export default function Home() {
                      </div>
                   )}
                   
-                  {messages.map((m) => (
+                  {messages.filter(m => !(m.role === 'user' && m.content.includes('【系统指令】'))).map((m) => (
                      <div key={m.id} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
                         <div className={`text-[10px] mb-1 ${m.role === 'user' ? "text-secondary" : "text-primary"}`}>
                            {m.role === 'user' ? "USER" : "SYSTEM"}
